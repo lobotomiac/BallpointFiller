@@ -4,11 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "PlayerPawn.generated.h"
 
 class UCameraComponent;
-
+class USpringArmComponent;
 UCLASS()
 class BALLPOINTFILLER_API APlayerPawn : public APawn
 {
@@ -39,11 +38,13 @@ protected:
 	FVector CurrentVelocity;
 	FRotator CurrentRotation;
 
+
 	// Camera controlls
 	UCameraComponent* OurCamera = nullptr;
 
 	// SpringArmComponent for helping with camera stabilization
 	USpringArmComponent* SpringArm = nullptr;
+
 
 	// Movement speed settings
 	UPROPERTY(EditAnywhere, Category = "Controls")
@@ -52,6 +53,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Controls")
 	float RotationSensitivity = 100.0f;
 
+// Camera settings (commented to make it work outside of C++ as a UE4 component)
 	// Camera Position Settings
 	UPROPERTY(EditAnywhere, Category = "CameraControl")
 	FVector SpringArmLocationOffset = FVector(0.0f, 0.0f, 0.0f);
@@ -63,6 +65,7 @@ protected:
 	// SpringArmLenght setting
 	UPROPERTY(EditAnywhere, Category = "CameraControl")
 	float SpringArmLength = 400.0f;
+
 
 	// creating our Pawn base
 	UPROPERTY(EditAnywhere)

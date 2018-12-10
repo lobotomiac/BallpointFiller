@@ -1,11 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PlayerPawn.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/StaticMeshComponent.h"
 
 // TODO Comment on CODE!!!!
+// TODO learn about QUATERNIONS
 
 
 // Sets default values
@@ -24,17 +26,17 @@ APlayerPawn::APlayerPawn()
 	VisibleControlledComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Our Mesh"));
 	VisibleControlledComponent->SetupAttachment(RootComponent);
 	
-	// SpringArm settings
+	// SpringArm  & Camera Settings
+
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
-	// TODO learn about QUATERNIONS
 	SpringArm->SetWorldRotation(SpringArmRotation);
 	SpringArm->SetRelativeLocation(SpringArmLocationOffset);
 	SpringArm->TargetArmLength = SpringArmLength;
 	
-	// Setting up Camera settings
 	OurCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Our Camera"));
 	OurCamera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+
 }
 
 // Called when the game starts or when spawned
