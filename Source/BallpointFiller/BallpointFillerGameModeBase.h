@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "BallpointFillerGameModeBase.generated.h"
 
+
+
 /**
  * 
  */
@@ -13,8 +15,8 @@ UCLASS()
 class BALLPOINTFILLER_API ABallpointFillerGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
-	
-	
-	
+
+
+
+
 };

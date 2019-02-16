@@ -24,29 +24,38 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	
 
 private:
+	/*Spawns the Ball_BP*/
+	UFUNCTION()
+	void SpawnBall();
+
+	// handle for managing the timer
+	FTimerHandle OutHandle;
+
+	// Default position of the Ball spawning object
 	FVector SpawnerStartingPosition;
 
 	/*Blueprint Reference of Ball class*/
 	UPROPERTY(EditDefaultsOnly, Category = "ActorSpawning")
 	TSubclassOf<ABall> BP_Ball;
 
-	/*Delay after the BP_Ball will get spawned*/
+	// multiplier to change the ball spawn rate
 	UPROPERTY(EditDefaultsOnly, Category = ActorSpawning)
-	float TimeToStartSpawn = 2.0f;
+	float SpawnIntervalMultiplier = 2.0f;
 
-	//  a constant spawn rate after initial spawn
+	// rate of spawning (mutated in cpp file)
 	UPROPERTY(EditDefaultsOnly, Category = ActorSpawning)
-	float SpawnInterval = 0.2f;
-	
-	/*Spawns the Ball_BP*/
-	UFUNCTION()
-	void SpawnBall();
+	float SpawnInterval = 2.0f;
 
+	//  randomizing the ball spawning interval
+	void UpdateSpawnInterval();
+
+	// Updating the ball spawning location
 	void UpdateSpawnerLocation();
 
-
+	// Range of the Spawner position change
+	UPROPERTY(EditDefaultsOnly, Category = ActorSpawning)
+	float PositionChangeRange = 425;
 };

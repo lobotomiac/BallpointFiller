@@ -7,7 +7,7 @@
 ABall::ABall()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 }
 
@@ -23,9 +23,4 @@ void ABall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-void ABall::Success()
-{
-	UE_LOG(LogTemp, Warning, TEXT("The actor spawn is a success!"))
 }

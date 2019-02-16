@@ -7,7 +7,7 @@
 ABallSpawner::ABallSpawner()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	// Get a starting anchor point for spawner
 	
@@ -18,21 +18,13 @@ void ABallSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FTimerHandle OutHandle;
 	SpawnerStartingPosition = GetActorLocation();
 	
 	// Will call SpawnBall after the specified time
-	GetWorld()->GetTimerManager().SetTimer(OutHandle, this, &ABallSpawner::SpawnBall, SpawnInterval, true, TimeToStartSpawn);
+	GetWorld()->GetTimerManager().SetTimer(OutHandle, this, &ABallSpawner::SpawnBall, SpawnInterval);
 
 }
 
-// Called every frame
-void ABallSpawner::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	// UE_LOG(LogTemp, Warning, TEXT("%f"), GetWorld()->GetTimeSeconds())
-}
 
 void ABallSpawner::SpawnBall()
 {
@@ -48,9 +40,16 @@ void ABallSpawner::SpawnBall()
 		
 		// Actual Spawn. The following function returns a reference to the spawned actor
 		ABall* BallRef = GetWorld()->SpawnActor<ABall>(BP_Ball, GetTransform(), SpawnParams);
-
-		UE_LOG(LogTemp, Warning, TEXT("Spawned the Ball at %s"), *GetActorLocation().ToString())
+		
+		// Changing the Spawn timer to makes sure its random for each ball
+		UpdateSpawnInterval();
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No Ball"))
+	}
+	// calls the timer again with a randomized SpawnInterval
+	GetWorld()->GetTimerManager().SetTimer(OutHandle, this, &ABallSpawner::SpawnBall, SpawnInterval);
 }
 
 //  changes position of spawner on the X plane
@@ -60,15 +59,26 @@ void ABallSpawner::UpdateSpawnerLocation()
 	FRandomStream RandomStream;
 	RandomStream.GenerateNewSeed();
 	// random range of change in spawner position
-	float PositionChange = RandomStream.FRandRange(-100.0f, 100.0f);
-
-	UE_LOG(LogTemp, Warning, TEXT("Position changing by: %f"), PositionChange)
+	float PositionChange = RandomStream.FRandRange(-PositionChangeRange, PositionChangeRange);
 
 	// updates spawner location
 	FVector NewSpawnerLocation = FVector(SpawnerStartingPosition.X + PositionChange, SpawnerStartingPosition.Y, SpawnerStartingPosition.Z);
 	SetActorLocation(NewSpawnerLocation);
 
-	// TODO spawn at random interwals
-
 }
 
+// getting a random number to update SpawnInterval
+void ABallSpawner::UpdateSpawnInterval()
+{
+	float RandomValue = FGenericPlatformMath::FRand();
+
+	if (!RandomValue)
+	{
+		SpawnInterval = 0.2f;
+	}
+	else
+	{
+		SpawnInterval = RandomValue * SpawnIntervalMultiplier;
+	}
+		
+}

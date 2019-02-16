@@ -5,8 +5,9 @@
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/BoxComponent.h"
 
-// TODO Comment on CODE!!!!
+// TODO Comment CODE!!!!
 // TODO learn about QUATERNIONS
 
 
@@ -21,19 +22,28 @@ APlayerPawn::APlayerPawn()
 
 	// Creating the Pawn components
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
-	
-	// Creating and setting the Mesh component (assign in Editor)
-	VisibleControlledComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Our Mesh"));
-	VisibleControlledComponent->SetupAttachment(RootComponent);
-	
-	// SpringArm  & Camera Settings
+	RootComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 5.0f));
 
+	// Creating and setting the Mesh component (assign in Editor)
+	PlayerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Player Mesh"));
+	PlayerMesh->SetupAttachment(RootComponent);
+	
+	PlayerMesh->SetSimulatePhysics(false);
+	
+	// Creating and Attaching the collision BoxComponent
+	PlayerHitBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Player Hit Box"));
+	PlayerHitBox->SetupAttachment(RootComponent);
+	PlayerHitBox->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f));
+
+	// Creating SpringArm and Setting it up
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
 	SpringArm->SetWorldRotation(SpringArmRotation);
 	SpringArm->SetRelativeLocation(SpringArmLocationOffset);
 	SpringArm->TargetArmLength = SpringArmLength;
-	
+	SpringArm->bInheritYaw = false;
+
+	// Creating a Camera
 	OurCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Our Camera"));
 	OurCamera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 
@@ -43,7 +53,7 @@ APlayerPawn::APlayerPawn()
 void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -85,3 +95,29 @@ void APlayerPawn::RotatePawn(float RotationValue)
 {
 	CurrentRotation.Yaw = FMath::Clamp(RotationValue, -1.0f, 1.0f) * RotationSensitivity;
 }
+
+
+// Checking if the StaticMesh used for Pawn is changed and Updating the UBoxComponent dimensions to match the StaticMesh dimensions
+#if WITH_EDITOR
+void APlayerPawn::PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent)
+{
+	FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(APlayerPawn, PlayerMesh))
+	{
+		// geting the size of player StaticMesh body and adjusting the size of the BoxComponent to match it 
+		auto PlayerMeshBounds = PlayerMesh->CalcBounds(GetActorTransform());
+		auto PlayerMeshScale = PlayerMesh->GetComponentScale();
+		PlayerHitBox->SetBoxExtent(PlayerMeshBounds.BoxExtent);
+		PlayerHitBox->SetRelativeScale3D(PlayerMeshScale);
+		// TODO Set to change the rotation as well // CHECK IF YOU"RE USING IT RIGHT - CHANCES ARE YOU AREN'T
+		
+		auto PlayerMeshRotation = PlayerMesh->GetComponentRotation();
+		
+		UE_LOG(LogTemp, Warning, TEXT("PostEditChangeProperty Called and did stuff"))
+	}
+	UE_LOG(LogTemp, Warning, TEXT("%s called PostEditChangeProperty without altering dimensions"), *PropertyName.ToString())
+
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+}
+#endif // WITH_EDITOR

@@ -8,6 +8,14 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class UBoxComponent;
+
+// TODO Make Getter and Setter methods for variables you're using!!
+// TODO make a socket in HitBox to allow for automatic mesh placement
+// TODO Set SpringArm NOT inherit MeshRotation
+
+
+
 UCLASS()
 class BALLPOINTFILLER_API APlayerPawn : public APawn
 {
@@ -23,6 +31,12 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+#if WITH_EDITOR
+	// Called after some changes were made in the EU4 Editor
+	virtual void PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent) override;
+#endif // WITH_EDITOR
+
 
 protected:
 	// Movement Input Method
@@ -43,31 +57,37 @@ protected:
 	UCameraComponent* OurCamera = nullptr;
 
 	// SpringArmComponent for helping with camera stabilization
+	UPROPERTY(EditAnywhere, Category = CameraControl)
 	USpringArmComponent* SpringArm = nullptr;
-
+	
 
 	// Movement speed settings
 	UPROPERTY(EditAnywhere, Category = "Controls")
-	float MoveSensitivity = 100.0f;
+	float MoveSensitivity = 200.0f;
+
 	// Rotation speed settings
 	UPROPERTY(EditAnywhere, Category = "Controls")
 	float RotationSensitivity = 100.0f;
 
-// Camera settings (commented to make it work outside of C++ as a UE4 component)
 	// Camera Position Settings
 	UPROPERTY(EditAnywhere, Category = "CameraControl")
-	FVector SpringArmLocationOffset = FVector(0.0f, 0.0f, 0.0f);
+	FVector SpringArmLocationOffset = FVector(0.0f, 0.0f, 50.0f);
 	
 	// SpringArm Rotation Settings
 	UPROPERTY(EditAnywhere, Category = "CameraControl")
-	FRotator SpringArmRotation = FRotator(-45.0f, 0.0f, 0.0f);
+	FRotator SpringArmRotation = FRotator(-45.0f, 270.0f, 0.0f);
 
 	// SpringArmLenght setting
 	UPROPERTY(EditAnywhere, Category = "CameraControl")
-	float SpringArmLength = 400.0f;
+	float SpringArmLength = 800.0f;
 
-
-	// creating our Pawn base
+	// creating our StaticMesh for the Pawn body
 	UPROPERTY(EditAnywhere)
-	USceneComponent* VisibleControlledComponent = nullptr;
+	UStaticMeshComponent* PlayerMesh = nullptr;
+
+	// adding a Collision Capsule component
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* PlayerHitBox = nullptr;
+	
+	
 };
